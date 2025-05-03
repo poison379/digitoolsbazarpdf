@@ -167,25 +167,24 @@ export default function InvoiceGenerator() {
     fileReader.readAsDataURL(file)
   }
 
-  // Function to add PAID stamp to PDF
-  const addPaidStamp = (doc: jsPDF, x: number, y: number, size = 20) => {
+  // Function to add professional PAID stamp to PDF
+  const addPaidStamp = (doc: jsPDF, x: number, y: number, size = 25) => {
     // Save the current state
     doc.saveGraphicsState()
 
-    // Set fill color to red
-    doc.setFillColor(220, 53, 69) // Bootstrap danger red
+    // Draw outer circle (border)
+    doc.setDrawColor(220, 53, 69) // Red border
+    doc.setLineWidth(0.5)
+    doc.circle(x, y, size / 2, "S")
 
-    // Draw oval/circle
-    doc.ellipse(x, y, size / 2, size / 3, "F")
+    // Draw inner circle (fill)
+    doc.setFillColor(220, 53, 69) // Red fill
+    doc.circle(x, y, size / 2 - 1, "F")
 
-    // Set text color to white
-    doc.setTextColor(255, 255, 255)
-
-    // Set font to bold
+    // Add PAID text
+    doc.setTextColor(255, 255, 255) // White text
     doc.setFont("helvetica", "bold")
-    doc.setFontSize(12)
-
-    // Add PAID text centered in the oval
+    doc.setFontSize(14)
     doc.text("PAID", x, y + 1, { align: "center", baseline: "middle" })
 
     // Restore the state
@@ -276,8 +275,8 @@ export default function InvoiceGenerator() {
       // Fix for BDT symbol - use "BDT" text instead of the symbol
       doc.text(`BDT ${invoiceData.amount}`, 160, 150)
 
-      // Add PAID stamp next to the total
-      addPaidStamp(doc, 180, 150, 20)
+      // Add PAID stamp below the total amount (not overlapping)
+      addPaidStamp(doc, 105, 170, 30)
 
       // Add footer - only thank you message, no payment terms
       doc.setFontSize(10)
@@ -517,24 +516,27 @@ export default function InvoiceGenerator() {
                 </div>
               </div>
 
-              {/* Total with PAID stamp */}
-              <div className="border-t pt-4 flex justify-end mb-12">
-                <div className="text-right flex items-center">
+              {/* Total */}
+              <div className="border-t pt-4 flex justify-end mb-8">
+                <div className="text-right">
                   <div className="flex justify-between w-48">
                     <span className="font-semibold">Total:</span>
                     <span>BDT {invoiceData.amount}</span>
                   </div>
-                  {/* PAID Stamp */}
-                  <div className="ml-4 relative">
-                    <div className="bg-red-600 text-white font-bold py-1 px-4 rounded-full transform -rotate-12 text-sm">
-                      PAID
-                    </div>
-                  </div>
+                </div>
+              </div>
+
+              {/* PAID Stamp - Centered and below total */}
+              <div className="flex justify-center mb-12">
+                <div className="relative w-24 h-24 flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full border-2 border-red-600"></div>
+                  <div className="absolute inset-1 rounded-full bg-red-600"></div>
+                  <div className="relative text-white font-bold text-lg z-10">PAID</div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="text-center text-sm text-gray-600 mt-16">
+              <div className="text-center text-sm text-gray-600 mt-8">
                 <p>Thank you for purchasing from DigiTools Bazar</p>
               </div>
             </div>
